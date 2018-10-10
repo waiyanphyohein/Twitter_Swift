@@ -8,14 +8,17 @@
 
 import Foundation
 import Alamofire
+import OAuthSwift
 import OAuthSwiftAlamofire
 import KeychainAccess
 
+
 class APIManager: SessionManager {
     
+    
     // MARK: TODO: Add App Keys
-    static let consumerKey = "YOUR_KEY_HERE"
-    static let consumerSecret = "YOUR_SECRET_HERE"
+    static let consumerKey = "uFTmFW66AAMEUwx3rZlZDMSCf"
+    static let consumerSecret = "LtlxIoQpBvHcqjpSMIA9Gs2E9wCJbr7xkx9EpSdBYoNedaZUgh"
 
     static let requestTokenURL = "https://api.twitter.com/oauth/request_token"
     static let authorizeURL = "https://api.twitter.com/oauth/authorize"
@@ -37,7 +40,7 @@ class APIManager: SessionManager {
                 if let error = error {
                     failure(error)
                 } else if let user = user {
-                    print("Welcome \(user.name)")
+                    print("Welcome \(String(describing: user.name))")
                     
                     // MARK: TODO: set User.current, so that it's persisted
                     
@@ -158,6 +161,20 @@ class APIManager: SessionManager {
     // Finish oauth process by fetching access token
     func handle(url: URL) {
         OAuth1Swift.handle(url: url)
+    }
+    
+    static func logout() {
+        // 1. Clear current user
+        User.current = nil
+        
+        // TODO: 2. Deauthorize OAuth tokens
+        
+        // 3. Post logout notification
+        NotificationCenter.default.post(name: NSNotification.Name("didLogout"), object: nil)
+        NotificationCenter.default.addObserver(forName: Notification.Name("didLogout"), object: nil, queue: OperationQueue.main) {
+            (Notification) in
+            print("Logout notification received")            
+        }
     }
     
     // MARK: Save Tokens in Keychain
